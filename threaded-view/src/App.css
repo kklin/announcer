@@ -1,0 +1,9 @@
+.comment {
+    border: 2px solid #dedede;
+    padding: 10px;
+    margin: 10px;
+}
+
+.comment .meta {
+    color: grey;
+}

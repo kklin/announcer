@@ -1,0 +1,53 @@
+version: '2'
+services:
+  mongodb:
+    image: 'mongo:3.6'
+    environment:
+      - 'MONGO_INITDB_ROOT_USERNAME=mongoadmin'
+      - 'MONGO_INITDB_ROOT_PASSWORD=secret'
+      - 'MONGO_INITDB_DATABASE=monday-comments-watcher'
+    ports:
+      - '27017:27017'
+    volumes:
+      - ./scripts/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      - mongo-data:/data/db
+    restart: always
+  comments-watcher-integration:
+    image: kevinklin/comments-watcher-integration
+    environment:
+      - 'PORT=80'
+      - 'DB_HOST=mongodb'
+      - "DB_USERNAME=${DB_USERNAME}"
+      - "DB_PASSWORD=${DB_PASSWORD}"
+      - "DB_NAME=${DB_NAME}"
+      - "MONDAY_CLIENT_ID=${MONDAY_CLIENT_ID}"
+      - "MONDAY_CLIENT_SECRET=${MONDAY_CLIENT_SECRET}"
+      - "MONDAY_SIGNING_SECRET=${MONDAY_SIGNING_SECRET}"
+      - "REDDIT_CLIENT_ID=${REDDIT_CLIENT_ID}"
+      - "REDDIT_CLIENT_SECRET=${REDDIT_CLIENT_SECRET}"
+      - "REDDIT_USERNAME=${REDDIT_USERNAME}"
+      - "REDDIT_PASSWORD=${REDDIT_PASSWORD}"
+    ports:
+      - '8080:80'
+    depends_on:
+      - 'mongodb'
+    restart: always
+  threaded-comments-view:
+    image: kevinklin/threaded-comments-view
+    ports:
+      - '8081:80'
+    restart: always
+  gateway:
+    image: linuxserver/swag
+    environment:
+      - "URL=monday-comments-tracker.kklin.dev"
+    volumes:
+      - lets-encrypt-state:/config
+      - ./scripts/nginx.conf:/config/nginx/site-confs/default
+    ports:
+      - '80:80'
+      - '443:443'
+
+volumes:
+  mongo-data:
+  lets-encrypt-state:

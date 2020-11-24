@@ -1,1 +1,1 @@
-# monday-comment-tracker
+# monday-comments-tracker
