@@ -36,6 +36,10 @@ class WorkerManager {
             let comments = [];
             const watchedPosts = await user.getWatchedPosts();
             for (const post of watchedPosts) {
+                if (!post.url) {
+                    continue;
+                }
+
                 const postComments = await reddit.getComments(post.url);
                 postComments.forEach((c) => {
                     c.postId = post.itemId;

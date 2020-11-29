@@ -138,7 +138,7 @@ class User {
                     title: item.group.title,
                 },
                 owners: item.column_values['author'],
-                url: item.column_values['link9'].url,
+                url: emptyGuard(item.column_values['link9'], (link) => link.url),
             };
         });
     }
@@ -184,6 +184,13 @@ class User {
             // properly parse those from Monday.
             {canChange: [columnMappings['upvotes']]});
     }
+}
+
+function emptyGuard(obj, fn) {
+    if (!obj) {
+        return undefined;
+    }
+    return fn(obj);
 }
 
 module.exports = {
